@@ -67,7 +67,11 @@
         let ess = signalStrenght.data.slice(
           signalStrenght.data.indexOf(":") + 1
         );
-        signalStrenght = ess;
+
+        let linkQuality = ess;
+        const linkQualityToDbm = (quality) => (quality * 100) / 70 - 100;
+        let signalStrengthDbm = Math.round(linkQualityToDbm(linkQuality));
+        signalStrenght = signalStrengthDbm;
       }
     } catch {}
   };

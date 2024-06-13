@@ -12,6 +12,7 @@
   let whitelisted: Array<any> = [];
   let modalOpen = false;
   let mac = "";
+  let transferSpeed: {};
   let errorMsg: string | null = null;
   let successMsg: string | null = null;
   let firmwareEnabled: boolean | null = null;
@@ -33,11 +34,11 @@
         dhcpLeases = resp.data;
         dhcpLeases = dhcpLeases.map((lease) => {
           const isWhitelisted = whitelisted.some(
-            (wl) => wl.macAddress.toUpperCase() === lease.mac.toUpperCase(),
+            (wl) => wl.macAddress.toUpperCase() === lease.mac.toUpperCase()
           );
           if (isWhitelisted) {
             let clientName = whitelisted.find(
-              (wl) => wl.macAddress.toUpperCase() === lease.mac.toUpperCase(),
+              (wl) => wl.macAddress.toUpperCase() === lease.mac.toUpperCase()
             ).name;
             return {
               ...lease,
@@ -47,6 +48,24 @@
           }
           return { ...lease, whitelisted: false };
         });
+      }
+    } catch {}
+  };
+  const fetchTransferSpeed = async () => {
+    try {
+      const response = await fetch("http://192.168.0.1:8080/cgi-bin/api.cgi", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cmd: "transfer_speed",
+        }),
+      });
+      transferSpeed = await response.json();
+      if (transferSpeed.success === true) {
+        transferSpeed = transferSpeed.data;
       }
     } catch {}
   };
@@ -199,6 +218,7 @@
 
   onMount(() => {
     fetchFirmwareStatus();
+    fetchTransferSpeed();
     fetchWhitelisted().then(() => {
       fetchDhcpLeases().then(() => {
         fetchDataUsage();
@@ -239,7 +259,9 @@
             <div class="flex flex-col justify-evenly">
               <span class="text-[12px] font-[400]">Download Speed</span>
               <span class="text-[12px] font-[700] text-[#1D1D1D]"
-                >13.5 Mb/s</span
+                >{transferSpeed
+                  ? transferSpeed.tx.ratestring
+                  : "0 kbit/s"}</span
               >
             </div>
           </div>
@@ -254,7 +276,7 @@
             <div class="flex flex-col justify-evenly">
               <span class="text-[12px] font-[400]">Upload Speed</span>
               <span class="text-[12px] font-[700] text-[#1D1D1D]"
-                >13.5 Mb/s</span
+                >{transferSpeed ? transferSpeed.rx.ratestring : "0 bit/s"}</span
               >
             </div>
           </div>

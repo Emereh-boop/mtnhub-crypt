@@ -275,7 +275,7 @@
         if (res.isSuccessful === true) {
           registrationSuccessful = true;
           hubOwnerEmail = res.data.hubOwnerEmail;
-          enableBusiness();
+          // enableBusiness();
           errorMsg = null;
         } else {
           errorMsg = res.message;

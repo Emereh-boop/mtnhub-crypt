@@ -290,11 +290,33 @@ function LinkHub(code)
     })
 
     local curlCommand = string.format(
-        'curl -s -X POST -H "Content-Type: application/json" -H "x-license-key: %s"  -d \'%s\' %s/api/v1/device/link-hub',
-        license,
-        body, SERVER)
-    local result = util.exec(curlCommand)
-    return result
+    'curl -s -X POST -H "Content-Type: application/json" -H "x-license-key: %s" -d \'%s\' %s/api/v1/device/link-hub',
+    license,
+    body,
+    SERVER
+)
+local result = util.exec(curlCommand)
+local res = jsonc.parse(result)
+
+if res.isSuccessful == true then
+    local devHash = res.data.devicePinHash
+    local devPhrase = res.data.deviceSecurityPhrase
+
+    -- Set the values
+    uci:set("wicrypt", "login", "hash", devHash)
+    uci:set("wicrypt", "login", "phrase", devPhrase)
+
+    -- Commit the changes
+    uci:commit("wicrypt")
+
+    -- Get the values after setting them
+    local hash = uci:get("wicrypt", "login", "hash")
+    local phrase = uci:get("wicrypt", "login", "phrase")
+
+end
+
+return result
+
 end
 
 function FirmwVersion()
