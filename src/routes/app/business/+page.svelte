@@ -175,6 +175,78 @@
   const handleModeChange = (event: any) => {
     firmwareEnabled = event.target.id === "enable-business";
   };
+  async function enableBusiness() {
+    progress = 0;
+    try {
+      const interval = setInterval(
+        () => {
+          progress += 1;
+          if (progress >= 100) {
+            clearInterval(interval);
+          }
+        },
+        (100 * 1000) / 100
+      );
+      showProgress = true;
+      const response = await fetch("http://192.168.0.1:8080/cgi-bin/api.cgi", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cmd: "setup_firmw",
+        }),
+      });
+      const resp = await response.json();
+      if (resp.success) {
+        progress = 90;
+        const response_e = await fetch(
+          "http://192.168.0.1:8080/cgi-bin/api.cgi",
+          {
+            method: "POST",
+            credentials: "include",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              cmd: "firmw_enable",
+            }),
+          }
+        );
+        const resp_e = await response_e.json();
+        if (resp_e.success) {
+          successMsg = "Business enabled successfully";
+          clearInterval(interval);
+          progress = 100;
+        } else {
+          errorMsg = resp.message;
+          clearInterval(interval);
+          progress = 100;
+          showProgress = false;
+        }
+      } else {
+        errorMsg = resp.message;
+        clearInterval(interval);
+        progress = 100;
+        showProgress = false;
+      }
+    } catch (e) {
+      const interval = setInterval(
+        () => {
+          progress += 1;
+          if (progress >= 100) {
+            clearInterval(interval);
+          }
+        },
+        (100 * 1000) / 100
+      );
+      errorMsg = "Failed to save changes";
+      clearInterval(interval);
+      progress = 100;
+      showProgress = false;
+    }
+  }
 
   onMount(() => {
     fetchFirmwareStatus();
@@ -203,6 +275,7 @@
         if (res.isSuccessful === true) {
           registrationSuccessful = true;
           hubOwnerEmail = res.data.hubOwnerEmail;
+          enableBusiness();
           errorMsg = null;
         } else {
           errorMsg = res.message;
@@ -306,9 +379,9 @@
           </div>
         {/if}
       </div>
-      <!-- <hr class="my-10" />
+      <hr class="my-10" />
       <form on:submit={saveChanges}>
-        <div class="grid grid-cols-3 gap-2">
+        <!-- <div class="grid grid-cols-3 gap-2">
           <div class="col-span-2">
             <div class="text-[18px] font-bold text-black">Hub switch</div>
             <p class="mt-[14px] text-gray-400">
@@ -373,7 +446,7 @@
           mode has a wide range of applications such as timed tokens, parental
           controls, ad sharing, and custom forms. Internet access is restricted
           via a splash screen, enabling only authorized users to connect.
-        </p>
+        </p> -->
 
         {#if showProgress}
           <div class="grid grid-cols-3 md:grid-cols-12 mt-6">
@@ -395,7 +468,7 @@
             >
           </div>
         {/if}
-      </form> -->
+      </form>
     </div>
     <div class="flex col-span-2 items-start justify-center p-[35.5px]">
       <a href="#/settings" class=" my-[4px] ml-3 flex"

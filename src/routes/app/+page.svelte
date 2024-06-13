@@ -8,6 +8,8 @@
   let dhcpLeases: Array<any> = [];
   let refreshInterval: NodeJS.Timeout;
   let wifiData: [];
+  let transferSpeed: {};
+  let signalStrenght: {};
   let systemInfo: {};
   let memoryInfo: {};
 
@@ -26,6 +28,46 @@
       wifiData = await response.json();
       if (wifiData.success === true) {
         wifiData = wifiData.data;
+      }
+    } catch {}
+  };
+  const fetchTransferSpeed = async () => {
+    try {
+      const response = await fetch("http://192.168.0.1:8080/cgi-bin/api.cgi", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cmd: "transfer_speed",
+        }),
+      });
+      transferSpeed = await response.json();
+      if (transferSpeed.success === true) {
+        transferSpeed = transferSpeed.data;
+      }
+    } catch {}
+  };
+  const fetchSignalStrenght = async () => {
+    try {
+      const response = await fetch("http://192.168.0.1:8080/cgi-bin/api.cgi", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cmd: "signal_strenght",
+        }),
+      });
+      signalStrenght = await response.json();
+      if (signalStrenght.success === true) {
+        console.log(signalStrenght.data);
+        let ess = signalStrenght.data.slice(
+          signalStrenght.data.indexOf(":") + 1
+        );
+        signalStrenght = ess;
       }
     } catch {}
   };
@@ -93,6 +135,8 @@
     fetchDhcpLeases();
     fetchMemoryInfo();
     fetchSystemInfo();
+    fetchTransferSpeed();
+    fetchSignalStrenght();
     refreshInterval = setInterval(() => {
       fetchDhcpLeases();
     }, 60000);
@@ -154,7 +198,9 @@
               <div class="flex flex-col justify-evenly">
                 <span class="text-[12px] font-[400]">Download Speed</span>
                 <span class="text-[12px] font-[700] text-[#1D1D1D]"
-                  >13.5 Mb/s</span
+                  >{transferSpeed
+                    ? transferSpeed.tx.ratestring
+                    : "0 kbit/s"}</span
                 >
               </div>
             </div>
@@ -169,7 +215,9 @@
               <div class="flex flex-col justify-evenly">
                 <span class="text-[12px] font-[400]">Upload Speed</span>
                 <span class="text-[12px] font-[700] text-[#1D1D1D]"
-                  >13.5 Mb/s</span
+                  >{transferSpeed
+                    ? transferSpeed.rx.ratestring
+                    : "0 bit/s"}</span
                 >
               </div>
             </div>
@@ -182,8 +230,10 @@
                 alt="Signal Strenght"
               />
               <div class="flex flex-col">
-                <span class="text-[12px] font-[400]">Signal strenght</span>
-                <span class="text-[12px] font-[700] text-[#1D1D1D]">60%</span>
+                <span class="text-[12px] font-[400]">Signal Strenght</span>
+                <span class="text-[12px] font-[700] text-[#1D1D1D]"
+                  >{signalStrenght ? `${signalStrenght} dbm` : "0 dbm"}</span
+                >
               </div>
             </div>
           </div>
@@ -224,7 +274,7 @@
               <span class=" col-span-1">Up Time</span>
               <span class=" col-span-2"
                 >{Math.round(memoryInfo?.uptime / 3600)} Hrs: {Math.round(
-                  memoryInfo?.uptime / 60,
+                  memoryInfo?.uptime / 60
                 ) % 60} Mins</span
               >
             </div>
@@ -314,7 +364,7 @@
                     {Math.round(
                       (memoryInfo?.memory?.available /
                         memoryInfo?.memory?.total) *
-                        100,
+                        100
                     )}%
                   </span>
                 </div>
@@ -364,7 +414,7 @@
                       ((memoryInfo?.memory?.total -
                         memoryInfo?.memory?.available) /
                         memoryInfo?.memory?.total) *
-                        100,
+                        100
                     )}%
                   </span>
                 </div>
@@ -411,7 +461,7 @@
                     {Math.round(
                       (memoryInfo?.memory?.buffered /
                         memoryInfo?.memory?.total) *
-                        100,
+                        100
                     )}%
                   </span>
                 </div>
@@ -459,7 +509,7 @@
                   <span class="absolute font-bold text-black text-[20px]">
                     {Math.round(
                       (memoryInfo?.memory?.cached / memoryInfo?.memory?.total) *
-                        100,
+                        100
                     )}%
                   </span>
                 </div>

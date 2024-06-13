@@ -5,10 +5,35 @@ local sys     = require("luci.sys")
 local jsonc   = require("luci.jsonc")
 local mtkwifi = require("mtkwifi")
 local uci     = require("luci.model.uci").cursor()
+local devices = mtkwifi.get_all_devs()
 
 local SERVER  = "https://device-api-stg.wicrypt.com"
 
-local function session_retrieve(session_id)
+function IfDevicesInfo()
+    local result = {}
+    for _, device in ipairs(devices) do
+        for _, vif in ipairs(device.vifs) do
+            if vif.vifname == 'ra0' or vif.vifname == 'rai0' then
+                table.insert(result, {
+                    devname = device.devname,
+                    vifs_prefix = device.vifs.__prefix,
+                    ssid = vif.__ssid,
+                    encrypttype = vif.__encrypttype,
+                    authmode =
+                        vif.__authmode,
+                    vifname = vif.vifname,
+                    hidessid = vif.__hidessid,
+                    vifidx = vif.vifidx,
+                    wpapsk = vif.__wpapsk,
+                    bssid = vif.__bssid
+                })
+            end
+        end
+    end
+    return result
+end
+
+function SessionRetrieve(session_id)
     local session = util.ubus("session", "get", { ubus_rpc_session = session_id })
     if type(session) == "table" then
         return jsonc.stringify({ data = session, success = true, error = nil })
@@ -17,7 +42,7 @@ local function session_retrieve(session_id)
     end
 end
 
-local function login(user, pass)
+function Login(user, pass)
     local lgin = util.ubus("session", "login", {
         username = "root",
         password = pass,
@@ -30,20 +55,20 @@ local function login(user, pass)
         })
         print("Set-Cookie: sessionId=" .. lgin.ubus_rpc_session .. "; Path=/; HttpOnly")
         print("\r\n")
-        return session_retrieve(lgin.ubus_rpc_session)
+        return SessionRetrieve(lgin.ubus_rpc_session)
     else
         print("\r\n")
         return jsonc.stringify({ error = "Wrong credentials", success = false, data = nil })
     end
 end
 
-local function board_info()
+function BoardInfo()
     print("\r\n")
     local info = util.ubus("system", "board")
     return jsonc.stringify({ data = info, success = true, error = nil })
 end
 
-local function firmw_enable()
+function FirmwEnable()
     print("\r\n")
     os.execute("/etc/init.d/spikeserviceprocd enable")
     local suc, exitCode, code = os.execute("/etc/init.d/spikeserviceprocd start")
@@ -54,7 +79,7 @@ local function firmw_enable()
     end
 end
 
-local function firmw_disable()
+function FirmwDisable()
     print("\r\n")
     local suc, exitCode, code = os.execute("/etc/init.d/spikeserviceprocd disable")
     if suc then
@@ -64,7 +89,7 @@ local function firmw_disable()
     end
 end
 
-local function register_device(email, pin)
+function RegisterDevice(email, pin)
     print("\r\n")
     local mac = util.ubus("luci-rpc", "getNetworkDevices", {}).br0.mac
     local wireless = util.ubus("iwinfo", "info", { device = "ra0" })
@@ -93,16 +118,17 @@ local function register_device(email, pin)
     return result
 end
 
-local function reg_status()
+function RegStatus()
     print("\r\n")
-    local bssid = util.ubus("iwinfo", "info", { device = "ra0" }).bssid
+    local ifInfo = IfDevicesInfo()
+    local bssid = ifInfo[1].bssid
     local curlCommand = string.format(
         'curl -s -X GET -H encType="multipart/form-data" -d "" "%s/api/v1/device/status/%s"', SERVER, bssid)
     local result = util.exec(curlCommand)
     return result
 end
 
-local function firmw_service_status()
+function FirmwServiceStatus()
     print("\r\n")
     local spikeserviceprocd = util.ubus("luci", "getInitList", { name = "spikeserviceprocd" })
     if type(spikeserviceprocd) ~= "table" then
@@ -111,28 +137,37 @@ local function firmw_service_status()
     return jsonc.stringify(spikeserviceprocd)
 end
 
-local function memoryInfo()
+function MemoryInfo()
     print("\r\n")
     local memory_info = util.ubus("system", "info")
+    if type(memory_info) ~= "table" then
+        return jsonc.stringify({ success = false, error = "Failed to get system info" })
+    end
     return jsonc.stringify({ data = memory_info, success = true, error = nil })
 end
 
-local function wireless()
+function Wireless()
     print("\r\n")
-    local wireless_info_ra0 = util.ubus("iwinfo", "info", { device = "ra0" })
-    local wireless_info_rai0 = util.ubus("iwinfo", "info", { device = "rai0" })
-    local wireless_info = {
-        ra0 = wireless_info_ra0,
-        rai0 = wireless_info_rai0
-    }
-    return jsonc.stringify({ data = wireless_info, success = true, error = nil })
+    local wifis = IfDevicesInfo()
+    return jsonc.stringify({ data = wifis, success = true, error = nil })
 end
 
-local function dhcplease()
+function transferSpeed()
+    print("\r\n")
+    local res = util.exec('vnstat -tr -i br0 --json')
+    return jsonc.stringify({ data = jsonc.parse(res) , success = true, error = nil })
+end
+function signalStrenght()
+    print("\r\n") 
+    local res = util.exec('iwconfig ra0 | awk \'/Link Quality/ { print $2}\'    ')
+    return jsonc.stringify({ data = res , success = true, error = nil }) 
+end
+
+function DhcpLease()
     print("\r\n")
     local cusor = io.open("/tmp/dnsmasq.leases", "r")
     if cusor == nil then
-        return jsonc.stringify({ data = {}, success = true, error = nil })
+        return jsonc.stringify({ data = {}, success = false, error = "Failed to open dnsmasq.leases" })
     end
     local content = cusor:read("*all")
     cusor:close()
@@ -157,32 +192,13 @@ local function dhcplease()
     return jsonc.stringify({ data = result, success = true, error = nil })
 end
 
-local function wifi_devices()
+function WifiDevices()
     print("\r\n")
-    local result = {}
-    local devices = mtkwifi.get_all_devs()
-    for _, device in ipairs(devices) do
-        for _, vif in ipairs(device.vifs) do
-            if vif.vifname == 'ra0' or vif.vifname == 'rai0' then
-                table.insert(result, {
-                    devname = device.devname,
-                    vifs_prefix = device.vifs.__prefix,
-                    ssid = vif.__ssid,
-                    encrypttype = vif.__encrypttype,
-                    authmode =
-                        vif.__authmode,
-                    vifname = vif.vifname,
-                    hidessid = vif.__hidessid,
-                    vifidx = vif.vifidx,
-                    wpapsk = vif.__wpapsk
-                })
-            end
-        end
-    end
+    local result = IfDevicesInfo()
     return jsonc.stringify({ data = result, success = true, error = nil })
 end
 
-local function change_ssid(devname, newssid)
+function ChangeSsid(devname, newssid)
     print("\r\n")
     if devname == "5G" then
         util.exec("wc_wifi_config ssid5 " .. newssid)
@@ -192,7 +208,7 @@ local function change_ssid(devname, newssid)
     return jsonc.stringify({ success = true, error = nil })
 end
 
-local function change_wireless_auth_config(devname, authmode, key)
+function ChangeWirelessAuthConfig(devname, authmode, key)
     print("\r\n")
     if devname == "5G" and key ~= nil then
         util.exec("wc_wifi_config pwd5 " .. key)
@@ -208,36 +224,36 @@ local function change_wireless_auth_config(devname, authmode, key)
     return jsonc.stringify({ success = true, error = nil })
 end
 
-local function whitelisted_devices()
+function WhitelistedDevices()
     print("\r\n")
     local cursor = io.open("/etc/wicrypt/database/whitelisted_devices.json", "r")
     if cursor == nil then
-        return jsonc.stringify({ data = {}, success = true, error = nil })
+        return jsonc.stringify({ data = {}, success = false, error = "Failed to open whitelisted_devices.json" })
     end
     local content = cursor:read("*all")
     cursor:close()
     return jsonc.stringify({ data = jsonc.parse(content).data.records, success = true, error = nil })
 end
 
-local function whitelist_dev(mac, name)
+function WhitelistDev(mac, name)
     print("\r\n")
     local resp = util.exec("sh /etc/wicrypt/shellscripts/splash_page.sh whitelistDevice " .. mac .. " " .. name)
     return jsonc.stringify(jsonc.parse(resp))
 end
 
-local function delist_dev(mac, name)
+function DelistDev(mac, name)
     print("\r\n")
     local resp = util.exec("sh /etc/wicrypt/shellscripts/splash_page.sh unwhitelist " .. mac .. " " .. name)
     return jsonc.stringify(jsonc.parse(resp))
 end
 
-local function download_whitelisted()
+function DownloadWhitelisted()
     print("\r\n")
     util.exec("sh /etc/wicrypt/shellscripts/splash_page.sh whitelistedDevices")
     return jsonc.stringify({ success = true, error = nil })
 end
 
-local function download_firmw_file()
+function DownloadFirmwFile()
     print("\r\n")
     local suc, exitCode, code = os.execute("sh /etc/wicrypt/shellscripts/splash_page.sh staticFiles")
     if suc then
@@ -247,14 +263,41 @@ local function download_firmw_file()
     end
 end
 
-local function data_usage()
+function DataUsage()
     print("\r\n")
     local res = util.exec(
         "sed -i 's/\"\"/\"/g' /etc/wicrypt/database/data_usage.json && cat /etc/wicrypt/database/data_usage.json")
     return jsonc.stringify({ data = jsonc.parse(res), success = true, error = nil })
 end
 
-local function firmw_version()
+function LinkHub(code)
+    print("\r\n")
+    local ifInfo = IfDevicesInfo()
+    local mac = util.ubus("luci-rpc", "getNetworkDevices", {}).br0.mac
+    local brd_info = util.ubus("system", "board")
+    local license = uci:get("wicrypt", "licence", "key")
+    local imei = util.exec("cat /tmp/.devinfo_module_data | grep \"module_imei\" | cut -d':' -f2")
+
+    local body = jsonc.stringify({
+        linkCode = code,
+        imei = imei,
+        bssid = ifInfo[1].bssid,
+        ssid = ifInfo[1].ssid,
+        architecture = brd_info.system,
+        deviceModel = brd_info.model,
+        macAddress = mac,
+        releaseVersion = "1.0.0",
+    })
+
+    local curlCommand = string.format(
+        'curl -s -X POST -H "Content-Type: application/json" -H "x-license-key: %s"  -d \'%s\' %s/api/v1/device/link-hub',
+        license,
+        body, SERVER)
+    local result = util.exec(curlCommand)
+    return result
+end
+
+function FirmwVersion()
     print("\r\n")
     local res = util.exec("uci get wicrypt.firmwareAssetRelease.releaseVersion")
     return jsonc.stringify({ data = { firmware_version = res }, success = true, error = nil })
@@ -296,7 +339,7 @@ local function api()
         local cmd = json_data.cmd or ""
 
         if cmd == "login" then
-            return login(json_data.username or "root", json_data.password)
+            return Login(json_data.username or "root", json_data.password)
         else
             local session = util.ubus("session", "get", { ubus_rpc_session = session_id })
             if type(session) ~= "table" then
@@ -305,43 +348,49 @@ local function api()
             end
         end
         if cmd == "board_info" then
-            return board_info()
+            return BoardInfo()
         elseif cmd == "firmw_enable" then
-            return firmw_enable()
+            return FirmwEnable()
         elseif cmd == "firmw_disable" then
-            return firmw_disable()
+            return FirmwDisable()
         elseif cmd == "reg_status" then
-            return reg_status()
+            return RegStatus()
         elseif cmd == "firmw_status" then
-            return firmw_service_status()
+            return FirmwServiceStatus()
         elseif cmd == "memory_info" then
-            return memoryInfo()
+            return MemoryInfo()
         elseif cmd == "wireless" then
-            return wireless()
+            return Wireless()
+        elseif cmd == "transfer_speed" then
+            return transferSpeed()
+        elseif cmd == "signal_strenght" then
+            return signalStrenght()
         elseif cmd == "dhcplease" then
-            return dhcplease()
+            return DhcpLease()
         elseif cmd == "register_device" then
-            return register_device(json_data.email, json_data.pin)
+            return RegisterDevice(json_data.email, json_data.pin)
         elseif cmd == "wifis" then
-            return wifi_devices()
+            return WifiDevices()
         elseif cmd == "change_ssid" then
-            return change_ssid(json_data.devname, json_data.newssid)
+            return ChangeSsid(json_data.devname, json_data.newssid)
         elseif cmd == "change_wireless_key" then
-            return change_wireless_auth_config(json_data.devname, json_data.authmode, json_data.newkey)
+            return ChangeWirelessAuthConfig(json_data.devname, json_data.authmode, json_data.newkey)
         elseif cmd == "setup_firmw" then
-            return download_firmw_file()
+            return DownloadFirmwFile()
         elseif cmd == "whitelisted" then
-            return whitelisted_devices()
+            return WhitelistedDevices()
         elseif cmd == "whitelist" then
-            return whitelist_dev(json_data.mac, json_data.name)
+            return WhitelistDev(json_data.mac, json_data.name)
         elseif cmd == "delist" then
-            return delist_dev(json_data.mac, json_data.name)
+            return DelistDev(json_data.mac, json_data.name)
         elseif cmd == "download_whitelisted" then
-            return download_whitelisted()
+            return DownloadWhitelisted()
         elseif cmd == "data_usg" then
-            return data_usage()
+            return DataUsage()
         elseif cmd == "firmw_version" then
-            return firmw_version()
+            return FirmwVersion()
+        elseif cmd == "link_hub" then
+            return LinkHub(json_data.code)
         elseif cmd == "validate_session" then
             return validate_session()
         else
