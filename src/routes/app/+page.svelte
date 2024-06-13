@@ -139,11 +139,11 @@
     fetchDhcpLeases();
     fetchMemoryInfo();
     fetchSystemInfo();
-    fetchTransferSpeed();
-    fetchSignalStrenght();
     refreshInterval = setInterval(() => {
+      fetchSignalStrenght();
+      fetchTransferSpeed();
       fetchDhcpLeases();
-    }, 60000);
+    }, 6000);
     return () => {
       clearInterval(refreshInterval);
     };

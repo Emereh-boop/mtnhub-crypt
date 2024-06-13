@@ -218,19 +218,19 @@
 
   onMount(() => {
     fetchFirmwareStatus();
-    fetchTransferSpeed();
     fetchWhitelisted().then(() => {
       fetchDhcpLeases().then(() => {
         fetchDataUsage();
       });
     });
     refreshInterval = setInterval(() => {
+      fetchTransferSpeed();
       fetchWhitelisted().then(() => {
         fetchDhcpLeases().then(() => {
           fetchDataUsage();
         });
       });
-    }, 60000);
+    }, 6000);
     return () => {
       clearInterval(refreshInterval);
     };
