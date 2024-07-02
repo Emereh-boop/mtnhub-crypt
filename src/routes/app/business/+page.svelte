@@ -291,14 +291,25 @@
 
 <Layout>
   <div class="lg:grid lg:grid-cols-12 container mx-auto">
-    <div class="flex col-span-2 items-start justify-center p-[35.5px]">
-      <a href="#/overview" class=" my-[4px] gap-[12px] ml-3 flex"
-        ><img
-          src="/backArrowIcon.svg"
-          class="w-[12.41px] ml-[7px]"
-          alt="view-all-connected-devices-icon"
-        />Previous
-      </a>
+    <div class="col-span-full flex justify-between md:justify-center">
+      <div class="flex col-span-2 items-start justify-center p-[35.5px]">
+        <a href="#/overview" class=" my-[4px] gap-[12px] ml-3 flex"
+          ><img
+            src="/backArrowIcon.svg"
+            class="w-[12.41px] ml-[7px]"
+            alt="view-all-connected-devices-icon"
+          />Previous
+        </a>
+      </div>
+      <div class="flex md:hidden items-start justify-center p-[35.5px]">
+        <a href="#/settings" class=" my-[4px] ml-3 flex"
+          >Next <img
+            src="/foward-icon.svg"
+            class="w-[12.41px] ml-[7px]"
+            alt="view-all-connected-devices-icon"
+          /></a
+        >
+      </div>
     </div>
     <div class="lg:col-span-8 p-[39px] border shadow-xl min-h-[420px]">
       {#if errorMsg}
@@ -337,7 +348,7 @@
             >
               <label for="linkCode">Link Code: </label>
               <div
-                class="flex ring-1 ring-[#C4C4C4] rounded-[16px] p-4 items-center justify-evenly h-[35px] w-[255px]"
+                class="flex ring-1 ring-[#C4C4C4] rounded-[16px] p-4 items-center h-[35px] w-[255px]"
               >
                 <input
                   type="text"
@@ -470,8 +481,8 @@
         {/if}
       </form>
     </div>
-    <div class="flex col-span-2 items-start justify-center p-[35.5px]">
-      <a href="#/settings" class=" my-[4px] ml-3 flex"
+    <div class="hidden md:flex col-span-full justify-center p-[35.5px]">
+      <a href="#/myhub" class=" my-[4px] ml-3 flex"
         >Next <img
           src="/foward-icon.svg"
           class="w-[12.41px] ml-[7px]"

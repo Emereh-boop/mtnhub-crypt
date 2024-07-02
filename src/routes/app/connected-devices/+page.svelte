@@ -239,15 +239,21 @@
 
 <Layout>
   <section
-    class="min-h-[600px] grid grid-cols-12 text-[14px] font-normal text-gray-400"
+    class="min-h-[600px] grid lg:grid-cols-12 text-[14px] font-normal text-gray-400"
   >
-    <div class=" col-start-2 col-span-10 p-[30px] border shadow-xl">
+    <div
+      class="md:block grid grid-rows-4 col-start-2 col-span-10 p-[30px] border shadow-xl"
+    >
       <div class="grid grid-cols-2 col-span-1 h-[60px] gap-[16px]">
-        <a href="#/overview" use:link class="flex items-start col-span-1">
+        <a
+          href="#/overview"
+          use:link
+          class="flex items-start md:col-span-1 col-span-2"
+        >
           <img src="/back-icon.svg" alt="logout-icon" class="w-[24px]" />
           <span class="text-[16.95px] font-bold ml-2 text-black">Back</span>
         </a>
-        <div class="col-span-1 grid grid-cols-2 gap-[16px]">
+        <div class="md:col-span-1 col-span-2 grid grid-cols-2 gap-[16px]">
           <div
             class="flex justify-evenly items-center rounded-[12px] ring-[1px] ring-[#E5B910]/20 h-[52px]"
           >

@@ -42,6 +42,14 @@ function SessionRetrieve(session_id)
     end
 end
 
+-- Function to run the parsing script and capture its output
+function runParsingScript()
+    local handle = io.popen("/script/parsing_script.sh")
+    local result = handle:read("*a")
+    handle:close()
+    return result
+end
+
 function Login(user, pass)
     local lgin = util.ubus("session", "login", {
         username = "root",
@@ -387,6 +395,8 @@ local function api()
             return transferSpeed()
         elseif cmd == "signal_strenght" then
             return signalStrenght()
+        elseif cmd == "log_history" then 
+            return runParsingScript()
         elseif cmd == "dhcplease" then
             return DhcpLease()
         elseif cmd == "register_device" then

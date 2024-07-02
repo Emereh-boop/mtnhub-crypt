@@ -64,9 +64,9 @@
 </script>
 
 <title>MTN-NG</title>
-<div class="flex flex-col min-h-screen">
+<div class="flex flex-col min-h-screen w-">
   <header class="bg-primary">
-    <div class="w-full container mx-auto">
+    <div class="w-full container px-2 md:px-0 mx-auto">
       <div class="flex justify-between text-[13px] text-black">
         <div class="mt-[30px] mb-4">
           <img src="/logo.svg" alt="mtn-logo" class="w-[85px]" />
@@ -157,7 +157,7 @@
     <slot />
   </main>
   <footer
-    class="container mx-auto flex justify-between py-12 text-[10px] font-normal text-gray-400"
+    class="container mx-auto flex justify-between py-12 px-4 md:px-0 text-[10px] font-normal text-gray-400"
   >
     <div>Copyright Wicrypt All Right Reserved © 2024</div>
     <div class=" text-gray-100">Powered by Wicrypt OS</div>

@@ -107,6 +107,15 @@
       wifiData = json.data;
     } catch (e) {}
   };
+  
+  function validateInput(event) {
+            const input = event.target.value;
+            const regex = /^[a-zA-Z0-9:_]*$/;
+            if (!regex.test(input)) {
+                event.target.value = input.slice(0, -1);
+                // alert("Only a-z, A-Z, 0-9, :, and _ characters are allowed.");
+            }
+        }
 
   onMount(() => {
     fetchWifis();
@@ -170,6 +179,7 @@
                 id="ssid2g"
                 name="ssid"
                 placeholder="WiFi Name"
+                on:input={(event) => validateInput(event)}
                 value={wifiData[0]?.ssid}
                 required
                 minlength="1"
@@ -259,6 +269,7 @@
                 id="ssid5g"
                 name="ssid"
                 placeholder="WiFi Name"
+                on:input={(event) => validateInput(event)}
                 value={wifiData[1]?.ssid}
                 required
                 minlength="1"
@@ -343,7 +354,7 @@
           </div>
           <hr />
           <div
-            class="text-[12px] text-[#6b6b6b] font-[400] flex items-center justify-between"
+            class="text-[12px] text-[#6b6b6b] font-[400] flex flex-col md:flex-row items-center justify-between"
           >
             <p>Firmware Version Version 2.0093 | Build 43344</p>
             <button

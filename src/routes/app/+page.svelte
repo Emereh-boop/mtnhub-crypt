@@ -135,6 +135,7 @@
   };
 
   onMount(() => {
+    fetchSignalStrenght();
     fetchWifiData();
     fetchDhcpLeases();
     fetchMemoryInfo();
@@ -154,14 +155,25 @@
 
 <Layout>
   <section
-    class="min-h-[600px] grid grid-cols-12 grid-flow-col text-[14px] font-normal text-gray-400"
+    class="min-h-[600px] lg:grid lg:grid-cols-12 lg:grid-flow-col text-[14px] font-normal text-gray-400"
   >
+    <div
+      class="flex col-span-full md:hidden items-start justify-center p-[35.5px]"
+    >
+      <a href="#/myhub" class=" my-[4px] ml-3 flex"
+        >Next <img
+          src="/foward-icon.svg"
+          class="w-[12.41px] ml-[7px]"
+          alt="view-all-connected-devices-icon"
+        /></a
+      >
+    </div>
     <div class=" col-start-2 col-span-10 p-[30px] border shadow-xl">
       <!-- Connected Devices -->
       <div>
         <div class="grid grid-cols-2 gap-[16px]">
           <div
-            class="grid grid-5 col-span-1 px-[28px] py-[17px] gap-[16px] ring-[1px] ring-[#E5B910]/20 h-[171px] rounded-[20px]"
+            class="grid grid-5 col-span-2 md:col-span-1 px-[28px] py-[17px] gap-[16px] ring-[1px] ring-[#E5B910]/20 h-auto lg:h-[171px] rounded-[20px]"
           >
             <span class="col-span-full text-[16.95px] font-bold mt-5 text-black"
               >Connected Devices <span class=" font-semibold leading-6"
@@ -190,7 +202,9 @@
               >
             </div>
           </div>
-          <div class="grid grid-cols-2 col-span-1 h-[120px] gap-[16px]">
+          <div
+            class="grid grid-cols-2 col-span-2 md:col-span-1 h-[120px] gap-[16px]"
+          >
             <div
               class="flex justify-evenly items-center w-4/5 rounded-[12px] ring-[1px] ring-[#E5B910]/20 h-[52px]"
             >
@@ -320,18 +334,16 @@
 
         <!-- Memory Info -->
         <div
-          class="mt-4 px-[28px] h-[238px] ring-[1px] ring-[#E5B910]/20 justify-evenly rounded-[20px] flex-col flex"
+          class="mt-4 px-[28px] gap-3 ring-[1px] ring-[#E5B910]/20 justify-evenly rounded-[20px] flex-col flex"
         >
           <!-- <img src="/info-icon.svg" class="w-[33.6px] mb-[9px]" alt="info-icon" /> -->
           <span class="text-[16.95px] font-bold text-black">Memory Info</span>
-          <!-- Available Memory -->
 
           <div
-            class="flex flex-wrap items-center justify-evenly gap-[80px] h[150]"
+            class="grid lg:grid-cols-4 grid-cols-2 grid-flow-dense items-center justify-evenly gap-[80px] h[150]"
           >
-            <div
-              class="flex flex-wrap items-center justify-evenly gap-[80px] h[150]"
-            >
+            <!-- Available Memory -->
+            <div class="flex items-center justify-evenly gap-[80px] h[150]">
               <div
                 class="text-center col-span-1 items-center justify-center text-lg grid gap-[14px]"
               >
@@ -526,7 +538,7 @@
         </div>
       </div>
     </div>
-    <div class="flex col-span-2 items-start justify-center p-[35.5px]">
+    <div class="hidden md:flex col-span-full justify-center p-[35.5px]">
       <a href="#/myhub" class=" my-[4px] ml-3 flex"
         >Next <img
           src="/foward-icon.svg"
