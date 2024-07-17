@@ -155,7 +155,7 @@
 
 <Layout>
   <section
-    class="min-h-[600px] lg:grid lg:grid-cols-12 lg:grid-flow-col text-[14px] font-normal text-gray-400"
+    class="min-h-[600px] lg:grid lg:grid-cols-12 lg:grid-flow-row text-[14px] font-normal text-gray-400"
   >
     <div
       class="flex col-span-full md:hidden items-start justify-center p-[35.5px]"
@@ -538,7 +538,9 @@
         </div>
       </div>
     </div>
-    <div class="hidden md:flex col-span-full justify-center p-[35.5px]">
+    <div
+      class="hidden col-start-12 md:flex justify-center items-start col-span-2 p-[35.5px]"
+    >
       <a href="#/myhub" class=" my-[4px] ml-3 flex"
         >Next <img
           src="/foward-icon.svg"

@@ -275,7 +275,7 @@
         if (res.isSuccessful === true) {
           registrationSuccessful = true;
           hubOwnerEmail = res.data.hubOwnerEmail;
-          // enableBusiness();
+          enableBusiness();
           errorMsg = null;
         } else {
           errorMsg = res.message;
@@ -291,7 +291,7 @@
 
 <Layout>
   <div class="lg:grid lg:grid-cols-12 container mx-auto">
-    <div class="col-span-full flex justify-between md:justify-center">
+    <div class="col-span-2 flex justify-between md:justify-center">
       <div class="flex col-span-2 items-start justify-center p-[35.5px]">
         <a href="#/overview" class=" my-[4px] gap-[12px] ml-3 flex"
           ><img
@@ -311,7 +311,9 @@
         >
       </div>
     </div>
-    <div class="lg:col-span-8 p-[39px] border shadow-xl min-h-[420px]">
+    <div
+      class="lg:col-span-8 col-start-2 p-[39px] border shadow-xl min-h-[420px]"
+    >
       {#if errorMsg}
         <div
           class="border-peach-400 mb-[16px] bg-peach-100 w-full sm:w-4/5 lg:w-3/5 rounded-[4px] p-4 border flex items-center"
@@ -391,7 +393,7 @@
         {/if}
       </div>
       <hr class="my-10" />
-      <form on:submit={saveChanges}>
+      <div>
         <!-- <div class="grid grid-cols-3 gap-2">
           <div class="col-span-2">
             <div class="text-[18px] font-bold text-black">Hub switch</div>
@@ -479,10 +481,12 @@
             >
           </div>
         {/if}
-      </form>
+      </div>
     </div>
-    <div class="hidden md:flex col-span-full justify-center p-[35.5px]">
-      <a href="#/myhub" class=" my-[4px] ml-3 flex"
+    <div
+      class="hidden md:flex col-span-2 col-start-11 items-start justify-center p-[35.5px]"
+    >
+      <a href="#/settings" class=" my-[4px] ml-3 flex"
         >Next <img
           src="/foward-icon.svg"
           class="w-[12.41px] ml-[7px]"
