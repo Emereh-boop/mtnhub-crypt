@@ -155,23 +155,23 @@
     }
   };
 
-  async function handlePaste() {
-    try {
-      if (navigator.clipboard) {
-        const text = await navigator.clipboard.readText();
-        code = text;
-      } else if (document.execCommand) {
-        const pasteTarget = document.getElementById("code");
-        pasteTarget.focus();
-        document.execCommand("paste");
-        code = pasteTarget.value;
-      } else {
-        alert("Your browser doesn't support any known clipboard methods");
-      }
-    } catch (err) {
-      console.error("Failed to paste text: ", err);
-    }
-  }
+  // async function handlePaste() {
+  //   try {
+  //     if (navigator.clipboard) {
+  //       const text = await navigator.clipboard.readText();
+  //       code = text;
+  //     } else if (document.execCommand) {
+  //       const pasteTarget = document.getElementById("code");
+  //       pasteTarget.focus();
+  //       document.execCommand("paste");
+  //       code = pasteTarget.value;
+  //     } else {
+  //       alert("Your browser doesn't support any known clipboard methods");
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed to paste text: ", err);
+  //   }
+  // }
   const handleModeChange = (event: any) => {
     firmwareEnabled = event.target.id === "enable-business";
   };
@@ -362,13 +362,13 @@
                   bind:value={code}
                   class="flex-1 font-mono text-[#1d1d1d] h-[35px] focus:outline-none"
                 />
-                <button
+                <!-- <button
                   type="button"
                   class="text-[#E5B910] cursor-default"
                   on:click={handlePaste}
                 >
                   Paste
-                </button>
+                </button> -->
               </div>
             </div>
             <!-- Register -->
