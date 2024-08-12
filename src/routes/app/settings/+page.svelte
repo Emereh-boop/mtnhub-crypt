@@ -5,6 +5,7 @@
   let successMsg: string | null = null;
   let show2g = false;
   let show5g = false;
+  let modalOpen = false;
   let wifiData: Array<any> | null = [];
   let progress= Number<any> = 10
 
@@ -107,6 +108,33 @@
       wifiData = json.data;
     } catch (e) {}
   };
+
+  const reset = async (event: any) => {
+    event.preventDefault()
+    errorMsg = null;
+    successMsg = null;
+    modalOpen = false;
+    try {
+      const response = await fetch("http://192.168.0.1:8080/cgi-bin/api.cgi", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          cmd: "reset",
+        }),
+      });
+      const resp = await response.json();
+      if (resp.success) {
+          successMsg = "Your device has been reset successfully";
+        } else {
+          errorMsg = "Failed to reset device";
+        }
+    } catch {
+      errorMsg = "an error occured"
+    }
+  };
   
   function validateInput(event) {
             const input = event.target.value;
@@ -134,6 +162,22 @@
       </a>
     </div>
     <div class="lg:col-span-8 p-[39px] border shadow-xl min-h-[420px]">
+      {#if errorMsg}
+        <div
+          class="border-peach-400 mb-[16px] bg-peach-100 w-full sm:w-4/5 lg:w-3/5 rounded-[4px] p-4 border flex items-center"
+        >
+          <img src="/info-red.svg" class=" col-span-1 mr-4" alt="" />
+          <p class="text-gray-400 col-span-4">{errorMsg}</p>
+        </div>
+      {/if}
+      {#if successMsg}
+        <div
+          class="border-black mb-[16px] w-full sm:w-4/5 lg:w-3/5 rounded-[4px] p-4 border flex items-center"
+        >
+          <img src="/info-icon.svg" class=" col-span-1 mr-4" alt="" />
+          <p class="text-gray-400 col-span-4">{successMsg}</p>
+        </div>
+      {/if}
       <div class="col-span-2 flex flex-col">
         <span class="col-span-full text-[18px] font-bold text-black"
           >Hub Properties</span
@@ -143,22 +187,6 @@
         >
       </div>
       <div class="w-full max-w-[450px]">
-        {#if errorMsg}
-          <div
-            class="border-peach-400 mb-[16px] bg-peach-100 w-full sm:w-4/5 lg:w-3/5 rounded-[4px] p-4 border flex items-center"
-          >
-            <img src="/info-red.svg" class=" col-span-1 mr-4" alt="" />
-            <p class="text-gray-400 col-span-4">{errorMsg}</p>
-          </div>
-        {/if}
-        {#if successMsg}
-          <div
-            class="border-black mb-[16px] w-full sm:w-4/5 lg:w-3/5 rounded-[4px] p-4 border flex items-center"
-          >
-            <img src="/info-icon.svg" class=" col-span-1 mr-4" alt="" />
-            <p class="text-gray-400 col-span-4">{successMsg}</p>
-          </div>
-        {/if}
         <form on:submit={saveChanges} id="wifiForm2g">
           <!-- SSID  -->
           <div class="flex flex-col justify-between">
@@ -357,16 +385,74 @@
             class="text-[12px] text-[#6b6b6b] font-[400] flex flex-col md:flex-row items-center justify-between"
           >
             <p>Firmware Version Version 2.0093 | Build 43344</p>
-            <button
-              type="submit"
-              class="ml-[141px] text-[12px] px-6 bg-primary text-white h-[35px] rounded-[20px]"
-            >
-              Download Update
-            </button>
+            <div class="">
+              <button
+                type="submit"
+                class="ml-[141px] text-[12px] px-6 bg-primary text-white h-[35px] rounded-[20px]"
+              >
+                Download Update
+              </button>
+              <button
+                type="button"
+                class="text-[12px] px-6 bg-primary text-white h-[35px] rounded-[20px]"
+                on:click={() => {
+                  modalOpen = true;
+                }}
+              >
+                Reset
+              </button>
+            </div>
           </div>
           <hr />
         </div>
       </div>
+      {#if modalOpen}
+        <div
+          class="modal z-50 fixed w-full h-full top-0 left-0 flex items-center justify-center p-8 lg:p-0"
+        >
+          <div
+            class="modal-overlay fixed w-full h-full bg-gray-900 opacity-50"
+          ></div>
+          <div
+            class="bg-white w-full lg:h-max lg:w-1/5 mx-auto rounded-lg shadow-xl z-50 overflow-y-auto"
+          >
+            <!-- Modal content goes here -->
+            <div
+              class="head text-center bg-primary py-5 px-8 text-2xl font-extrabold"
+            >
+              <!-- Modal header -->
+              Reset
+            </div>
+            <div class="content p-8">
+              <!-- Modal body -->
+              <form method="POST" on:submit={reset}>
+                <div class="flex flex-col align-middle text-center">
+                  <div class="w-full mb-4">
+                    Are you sure you want to continue ?
+                  </div>
+                  <div class=" w-full flex gap-4 justify-center">
+                    <button
+                      type="submit"
+                      class="text-[12px] px-6 bg-primary text-white h-[35px] rounded-[20px]"
+                    >
+                      Yes
+                    </button>
+                    <button
+                      type="button"
+                      class="text-[12px] px-6 border-primary border text-primary h-[35px] rounded-[20px]"
+                      on:click={() => {
+                        modalOpen = false;
+                      }}
+                    >
+                      cancel
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      {/if}
       {#if !show5g}
         <div class="h-[141px] rounded-[20px]"></div>
         <!-- <div class="grid grid-cols-3 md:grid-cols-12 mt-6">
