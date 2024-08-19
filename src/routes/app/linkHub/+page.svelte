@@ -29,9 +29,15 @@
         devRegistered = resp.data.isRegistered;
       } else {
         errorMsg = resp.message;
+        setTimeout(() => {
+          errorMsg = null;
+        }, 3000);
       }
     } catch (e) {
       errorMsg = "Failed to fetch registration status";
+      setTimeout(() => {
+        errorMsg = null;
+      }, 3000);
     }
   };
 
@@ -61,6 +67,9 @@
     }
     if (!devRegistered) {
       errorMsg = "Device not registered";
+      setTimeout(() => {
+        errorMsg = null;
+      }, 3000);
       return;
     }
     if (firmwareEnabled) {
@@ -110,23 +119,35 @@
             successMsg = "Business enabled successfully";
             clearInterval(interval);
             progress = 100;
+            setTimeout(() => {
+              successMsg = null;
+            }, 3000);
           } else {
             errorMsg = resp.message;
             clearInterval(interval);
             progress = 100;
             showProgress = false;
+            setTimeout(() => {
+              errorMsg = null;
+            }, 3000);
           }
         } else {
           errorMsg = resp.message;
           clearInterval(interval);
           progress = 100;
           showProgress = false;
+          setTimeout(() => {
+            errorMsg = null;
+          }, 3000);
         }
       } catch (e) {
         errorMsg = "Failed to save changes";
         clearInterval(interval);
         progress = 100;
         showProgress = false;
+        setTimeout(() => {
+          errorMsg = null;
+        }, 3000);
       }
     } else {
       try {
@@ -146,11 +167,20 @@
         const resp = await response.json();
         if (resp.success) {
           successMsg = "Business disabled successfully";
+          setTimeout(() => {
+            successMsg = null;
+          }, 3000);
         } else {
           errorMsg = resp.message;
+          setTimeout(() => {
+            errorMsg = null;
+          }, 3000);
         }
       } catch (error) {
         errorMsg = "Failed to save changes";
+        setTimeout(() => {
+          errorMsg = null;
+        }, 3000);
       }
     }
   };
@@ -219,17 +249,26 @@
           successMsg = "Business enabled successfully";
           clearInterval(interval);
           progress = 100;
+          setTimeout(() => {
+            successMsg = null;
+          }, 3000);
         } else {
           errorMsg = resp.message;
           clearInterval(interval);
           progress = 100;
           showProgress = false;
+          setTimeout(() => {
+            errorMsg = null;
+          }, 3000);
         }
       } else {
         errorMsg = resp.message;
         clearInterval(interval);
         progress = 100;
         showProgress = false;
+        setTimeout(() => {
+          errorMsg = null;
+        }, 3000);
       }
     } catch (e) {
       const interval = setInterval(
@@ -245,6 +284,9 @@
       clearInterval(interval);
       progress = 100;
       showProgress = false;
+      setTimeout(() => {
+        errorMsg = null;
+      }, 3000);
     }
   }
 
@@ -279,12 +321,21 @@
           errorMsg = null;
         } else {
           errorMsg = res.message;
+          setTimeout(() => {
+            errorMsg = null;
+          }, 3000);
         }
       } else {
         errorMsg = "Registration failed: Network error";
+        setTimeout(() => {
+          errorMsg = null;
+        }, 3000);
       }
     } catch (err) {
       errorMsg = "An error occurred";
+      setTimeout(() => {
+        errorMsg = null;
+      }, 3000);
     }
   }
 </script>

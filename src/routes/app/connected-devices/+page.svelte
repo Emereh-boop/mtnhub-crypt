@@ -121,11 +121,20 @@
             cmd: "download_whitelisted",
           }),
         });
+        setTimeout(() => {
+          successMsg = null;
+        }, 3000);
       } else {
         errorMsg = res.message;
+        setTimeout(() => {
+          errorMsg = null;
+        }, 3000);
       }
     } catch {
       errorMsg = "An error occurred";
+      setTimeout(() => {
+        errorMsg = null;
+      }, 3000);
     }
   };
 
@@ -160,11 +169,20 @@
             cmd: "download_whitelisted",
           }),
         });
+        setTimeout(() => {
+          successMsg = null;
+        }, 3000);
       } else {
         errorMsg = res.message;
+        setTimeout(() => {
+          errorMsg = null;
+        }, 3000);
       }
     } catch {
       errorMsg = "An error occurred";
+      setTimeout(() => {
+        errorMsg = null;
+      }, 3000);
     }
   };
 

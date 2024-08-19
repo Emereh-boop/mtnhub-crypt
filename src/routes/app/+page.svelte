@@ -175,31 +175,42 @@
           <div
             class="grid grid-5 col-span-2 md:col-span-1 px-[28px] py-[17px] gap-[16px] ring-[1px] ring-[#E5B910]/20 h-auto lg:h-[171px] rounded-[20px]"
           >
-            <span class="col-span-full text-[16.95px] font-bold mt-5 text-black"
-              >Connected Devices <span class=" font-semibold leading-6"
-                >[ {dhcpLeases?.length ?? 0} ]</span
-              ></span
+            <span
+              class="col-span-full text-[16.95px] font-bold mt-5 text-black"
             >
-            {#each dhcpLeases ?? [] as lease, i}
-              <div class="col-span-3 flex">
-                <div class="flex-1">
-                  <span class=" font-bold text-black font-mono"
-                    >[ {i + 1} ]
-                  </span>{lease.clientName}
+              Connected Devices <span class="font-semibold leading-6"
+                >[ {dhcpLeases?.length ?? 0} ]</span
+              >
+            </span>
+
+            {#if Array.isArray(dhcpLeases) && dhcpLeases.length > 0}
+              {#each dhcpLeases.slice(0, 5) as lease, i}
+                <!-- Truncate to first 5 devices -->
+                <div class="col-span-3 flex">
+                  <div class="flex-1">
+                    <span class="font-bold text-black font-mono"
+                      >[ {i + 1} ]</span
+                    >{lease.clientName}
+                  </div>
+                  <div class="flex-1">{lease.mac}</div>
                 </div>
-                <div class="flex-1">{lease.mac}</div>
-              </div>
-            {/each}
+              {/each}
+            {:else}
+              <div>No devices found.</div>
+            {/if}
+
             <div class="flex items-center justify-center">
               <a
                 href="#/connected-devices"
                 class="col-span-full my-[4px] ml-3 flex"
-                >View All Devices <img
+              >
+                View All Devices
+                <img
                   src="/foward-icon.svg"
                   class="w-[12.41px] ml-[7px]"
                   alt="view-all-connected-devices-icon"
-                /></a
-              >
+                />
+              </a>
             </div>
           </div>
           <div

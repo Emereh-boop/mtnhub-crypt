@@ -44,11 +44,20 @@
         const resp = await response.json();
         if (resp.success) {
           successMsg = "SSID changed successfully";
+          setTimeout(() => {
+          successMsg = null;
+        }, 3000)
         } else {
           errorMsg = "Failed to save changes";
+          setTimeout(() => {
+          errorMsg = null;
+        }, 3000)
         }
       } catch (e) {
         errorMsg = "Failed to save changes";
+        setTimeout(() => {
+          errorMsg = null;
+        }, 3000)
       }
     }
     if (
@@ -83,9 +92,15 @@
           successMsg = "Key changed successfully";
         } else {
           errorMsg = "Failed to save changes";
+          setTimeout(() => {
+          errorMsg = null;
+        }, 3000)
         }
       } catch (e) {
         errorMsg = "Failed to save changes";
+        setTimeout(() => {
+          errorMsg = null;
+        }, 3000)
       }
     }
   };
@@ -128,11 +143,20 @@
       const resp = await response.json();
       if (resp.success) {
           successMsg = "Your device has been reset successfully";
+          setTimeout(() => {
+          successMsg = null;
+        }, 3000)
         } else {
           errorMsg = "Failed to reset device";
+          setTimeout(() => {
+          errorMsg = null;
+        }, 3000)
         }
     } catch {
       errorMsg = "an error occured"
+      setTimeout(() => {
+          errorMsg = null;
+        }, 3000)
     }
   };
   
