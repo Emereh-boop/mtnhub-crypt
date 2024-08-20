@@ -25,9 +25,15 @@
         replace("/overview");
       } else {
         loginError = res.error;
+        setTimeout(() => {
+          loginError = null;
+        }, 3000);
       }
     } catch (err) {
       loginError = "An error occurred";
+      setTimeout(() => {
+        loginError = null;
+      }, 3000);
     }
   }
 </script>
