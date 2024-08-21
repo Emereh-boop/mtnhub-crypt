@@ -173,7 +173,7 @@
       <div>
         <div class="grid grid-cols-2 gap-[16px]">
           <div
-            class="grid grid-5 col-span-2 md:col-span-1 px-[28px] py-[17px] gap-[16px] ring-[1px] ring-[#E5B910]/20 h-auto lg:h-[171px] rounded-[20px]"
+            class="grid grid-5 col-span-2 md:col-span-1 px-[28px] py-[17px] gap-[16px] ring-[1px] ring-[#E5B910]/20 h-auto lg:h-auto rounded-[20px]"
           >
             <span
               class="col-span-full text-[16.95px] font-bold mt-5 text-black"
